@@ -1,2 +1,1 @@
-colorama>=0.4.6
-requests>=2.25.1
+# Python 3.11+; Xpose uses the standard library only.

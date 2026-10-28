@@ -1,17 +1,20 @@
 [
   {
     "name": "Mongo URI",
-    "pattern": "mongodb(?:\\+srv)?://[^ \\n]+",
-    "severity": "HIGH"
+    "pattern": "mongodb(?:\\+srv)?://[^\\s\"'<>]+",
+    "severity": "HIGH",
+    "credential_uri": true
   },
   {
     "name": "Postgres URI",
-    "pattern": "postgres(?:ql)?://[^ \\n]+",
-    "severity": "HIGH"
+    "pattern": "postgres(?:ql)?://[^\\s\"'<>]+",
+    "severity": "HIGH",
+    "credential_uri": true
   },
   {
     "name": "MySQL URI",
-    "pattern": "mysql://[^ \\n]+",
-    "severity": "HIGH"
+    "pattern": "mysql://[^\\s\"'<>]+",
+    "severity": "HIGH",
+    "credential_uri": true
   }
 ]

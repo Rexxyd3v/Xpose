@@ -1,7 +1,32 @@
 [
- {"name":"GitHub PAT","pattern":"(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36}","severity":"HIGH"},
- {"name":"Discord Token","pattern":"[MN][A-Za-z0-9_-]{23}\\.[A-Za-z0-9_-]{6}\\.[A-Za-z0-9_-]{27}","severity":"HIGH"},
- {"name":"Slack Token","pattern":"xox[a-zA-Z]-[A-Za-z0-9-]{10,48}","severity":"HIGH"},
- {"name":"JWT","pattern":"eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}","severity":"MEDIUM"},
- {"name":"Private Key","pattern":"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----","severity":"CRITICAL"}
+  {
+    "name": "GitHub PAT",
+    "pattern": "(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36}",
+    "severity": "HIGH"
+  },
+  {
+    "name": "Discord Token",
+    "pattern": "[MN][A-Za-z0-9_-]{23}\\.[A-Za-z0-9_-]{6}\\.[A-Za-z0-9_-]{27}",
+    "severity": "HIGH"
+  },
+  {
+    "name": "Slack Token",
+    "pattern": "xox[a-zA-Z]-[A-Za-z0-9-]{10,48}",
+    "severity": "HIGH"
+  },
+  {
+    "name": "JWT",
+    "pattern": "eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}",
+    "severity": "MEDIUM"
+  },
+  {
+    "name": "Private Key",
+    "pattern": "-----BEGIN (?P<pem_type>(?:RSA |EC |OPENSSH |ENCRYPTED |DSA )?PRIVATE KEY)-----[\\s\\S]*?-----END (?P=pem_type)-----|-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED |DSA )?PRIVATE KEY-----",
+    "severity": "CRITICAL"
+  },
+  {
+    "name": "GitHub fine-grained PAT",
+    "pattern": "\\bgithub_pat_[A-Za-z0-9_]{40,255}\\b",
+    "severity": "HIGH"
+  }
 ]

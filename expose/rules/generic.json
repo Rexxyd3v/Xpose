@@ -1,7 +1,9 @@
 [
   {
     "name": "Generic API Key",
-    "pattern": "(?i)(?:api[_-]?key|api[_-]?secret)\\s*[:=]\\s*[\"'][^\"']{16,}[\"']",
-    "severity": "MEDIUM"
+    "pattern": "(?i)(?:api[_-]?key|api[_-]?secret)\\s*[:=]\\s*[\"\\'](?P<secret>[^\"\\'\\r\\n]{16,})[\"\\']",
+    "severity": "MEDIUM",
+    "generic": true,
+    "min_entropy": 3.2
   }
 ]

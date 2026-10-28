@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xpose-scanner"
+version = "2.0.0"
+description = "Local-first secret scanning for files, Git history, and staged changes"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = []
+
+[project.scripts]
+xpose = "expose.cli.app:main"
+
+[tool.setuptools.packages.find]
+include = ["expose*"]
+
+[tool.setuptools.package-data]
+"expose.rules" = ["*.json"]

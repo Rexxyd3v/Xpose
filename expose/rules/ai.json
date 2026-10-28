@@ -1,6 +1,22 @@
 [
- {"name":"OpenAI API Key","pattern":"sk-[A-Za-z0-9]{20,55}","severity":"HIGH"},
- {"name":"Anthropic API Key","pattern":"sk-ant-[A-Za-z0-9\\-_]{20,}","severity":"HIGH"},
- {"name":"OpenRouter API Key","pattern":"sk-or-v1-[A-Za-z0-9]{20,}","severity":"HIGH"},
- {"name":"Google/Firebase/Gemini API Key","pattern":"AIza[0-9A-Za-z\\-_]{35}","severity":"HIGH"}
+  {
+    "name": "OpenAI API Key",
+    "pattern": "\\bsk-(?:(?:proj|svcacct)-[A-Za-z0-9_-]{20,}|[A-Za-z0-9]{20,})(?![A-Za-z0-9_-])",
+    "severity": "HIGH"
+  },
+  {
+    "name": "Anthropic API Key",
+    "pattern": "sk-ant-[A-Za-z0-9\\-_]{20,}",
+    "severity": "HIGH"
+  },
+  {
+    "name": "OpenRouter API Key",
+    "pattern": "sk-or-v1-[A-Za-z0-9]{20,}",
+    "severity": "HIGH"
+  },
+  {
+    "name": "Google/Firebase/Gemini API Key",
+    "pattern": "AIza[0-9A-Za-z\\-_]{35}",
+    "severity": "HIGH"
+  }
 ]

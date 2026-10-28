@@ -1,71 +1,34 @@
-import subprocess
-import tempfile
-import shutil
+"""Public GitHub cloning with validated targets and bounded subprocesses."""
+import re
 import os
-
-from remote.parser import parse_github_url
-from rules.loader import load_rules, load_ignore_patterns
+import subprocess
 
 
-def clone_repo(repo_url, dest_dir):
-    """Clone a public GitHub repo."""
-    repo_path = parse_github_url(repo_url)
-    clone_url = f"https://github.com/{repo_path}.git"
-
-    print(f"[*] Cloning {clone_url} ...")
-    result = subprocess.run(
-        ["git", "clone", "--depth", "1", "--single-branch", "--no-tags", clone_url, dest_dir],
-        capture_output=True,
-        text=True,
-        timeout=300,
-    )
-
-    if result.returncode != 0:
-        raise RuntimeError(f"Git clone failed: {result.stderr}")
-
-    print(f"[+] Cloned successfully to {dest_dir}")
-    return dest_dir
+def parse_github_url(url):
+    value = url.strip().rstrip("/")
+    for prefix in ("https://github.com/", "http://github.com/", "git@github.com:"):
+        if value.startswith(prefix):
+            value = value[len(prefix):]
+            break
+    if value.endswith(".git"):
+        value = value[:-4]
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9_][A-Za-z0-9_.-]*", value):
+        raise ValueError("Use a GitHub owner/repo or repository URL (without credentials or branch paths).")
+    return value
 
 
-def remote_scan(url, rules=None, ignore_patterns=None, show_tree_flag=False):
-    """Scan a remote GitHub repository.
-
-    If `rules` or `ignore_patterns` are not provided, defaults from `Expose/rules` are loaded.
-
-    Returns:
-        (findings, tmpdir) where tmpdir is the cloned directory path.
-    """
-    tmpdir = tempfile.mkdtemp(prefix="expose_")
-    try:
-        # Load defaults if not provided
-        if rules is None or ignore_patterns is None:
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            rules_dir = os.path.normpath(os.path.join(base_dir, "..", "rules"))
-            if rules is None:
-                rules = load_rules(rules_dir)
-            if ignore_patterns is None:
-                ignore_patterns = load_ignore_patterns(rules_dir)
-
-        clone_repo(url, tmpdir)
-
-        if show_tree_flag:
-            from core.tree import show_tree
-
-            print("\n" + "=" * 50)
-            print(" Repository Structure")
-            print("=" * 50)
-            show_tree(tmpdir, ignore_patterns)
-            print()
-
-        from core.scanner import Scanner
-
-        scanner = Scanner(rules, ignore_patterns)
-        res = scanner.scan(tmpdir)
-        return res, tmpdir
-
-    except Exception as e:
-        print(f"[-] Error: {e}")
-        return [], None
-    finally:
-        shutil.rmtree(tmpdir, ignore_errors=True)
-
+def clone_repo(repo_url, dest_dir, full_history=False):
+    repo = parse_github_url(repo_url)
+    args = ["git", "-c", "core.hooksPath=", "clone", "--no-checkout", "--no-tags"]
+    if not full_history:
+        args += ["--depth", "1", "--single-branch"]
+    result = subprocess.run(args + ["https://github.com/" + repo + ".git", str(dest_dir)], capture_output=True, stdin=subprocess.DEVNULL,
+                            env={**os.environ, "GIT_TERMINAL_PROMPT": "0", "GCM_INTERACTIVE": "never"}, timeout=300)
+    if result.returncode:
+        error = result.stderr.decode("utf-8", errors="replace").lower()
+        if any(text in error for text in ("repository not found", "authentication failed", "could not read username")):
+            raise ValueError("GitHub repository is not accessible. Check the owner/repo spelling and that the repository is public.")
+        if any(text in error for text in ("could not resolve host", "failed to connect", "couldn't connect")):
+            raise ValueError("Cannot connect to GitHub. Check your internet connection, proxy, or DNS settings.")
+        raise ValueError("Clone failed. Check the public repository URL, network, and Git installation.")
+    return str(dest_dir)
